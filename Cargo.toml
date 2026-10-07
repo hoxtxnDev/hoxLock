@@ -1,0 +1,10 @@
+[package]
+name = "generador-contrasenas"
+version = "0.1.0"
+edition = "2021"
+description = "Generador de contraseñas aleatorias con hashes Argon2id"
+
+[dependencies]
+argon2 = "0.5.3"
+rand = "0.8.5"
+rpassword = "7.4"

@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+# Rustup suele instalar Cargo aquí sin añadirlo todavía al PATH de esta sesión.
+CARGO_BIN="${CARGO_HOME:-$HOME/.cargo}/bin"
+if [ -d "$CARGO_BIN" ]; then
+    PATH="$CARGO_BIN:$PATH"
+    export PATH
+fi
+if ! command -v cargo >/dev/null 2>&1; then
+    echo "Error: falta Rust/Cargo. Instálalo desde https://rustup.rs/" >&2
+    exit 127
+fi
+
+cd "$(dirname "$0")"
+exec cargo run --quiet --release -- "$@"
