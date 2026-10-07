@@ -1,4 +1,4 @@
-use argon2::password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString};
+use argon2::password_hash::{PasswordHasher, SaltString};
 use argon2::{Algorithm, Argon2, Params, Version};
 use rand::rngs::OsRng;
 use rand::{seq::SliceRandom, Rng};
@@ -7,7 +7,6 @@ use std::env;
 const MIN_LENGTH: usize = 16;
 const MAX_LENGTH: usize = 256;
 const DEFAULT_LENGTH: usize = 32;
-const MAX_COUNT: usize = 20;
 const LOWER: &[u8] = b"abcdefghijklmnopqrstuvwxyz";
 const UPPER: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const DIGITS: &[u8] = b"0123456789";
@@ -47,10 +46,8 @@ fn hash_contrasena(contrasena: &str) -> Result<String, String> {
 enum Accion {
     Generar {
         longitud: usize,
-        cantidad: usize,
         con_hash: bool,
     },
-    Verificar(String),
     Ayuda,
 }
 
@@ -68,116 +65,64 @@ fn numero(valor: Option<String>, nombre: &str, min: usize, max: usize) -> Result
 fn argumentos() -> Result<Accion, String> {
     let mut args = env::args().skip(1);
     let mut longitud = DEFAULT_LENGTH;
-    let mut cantidad = 1;
     let mut con_hash = true;
-    let mut opciones_generacion = false;
-    let mut verificar = None;
 
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--ayuda" | "-h" => return Ok(Accion::Ayuda),
             "--longitud" | "-l" => {
                 longitud = numero(args.next(), "--longitud", MIN_LENGTH, MAX_LENGTH)?;
-                opciones_generacion = true;
-            }
-            "--cantidad" | "-n" => {
-                cantidad = numero(args.next(), "--cantidad", 1, MAX_COUNT)?;
-                opciones_generacion = true;
             }
             "--sin-hash" => {
                 con_hash = false;
-                opciones_generacion = true;
-            }
-            "--verificar" => {
-                if verificar.is_some() {
-                    return Err("--verificar solo puede usarse una vez".into());
-                }
-                verificar = Some(args.next().ok_or("falta el hash de --verificar")?);
             }
             _ => return Err(format!("opción desconocida: {arg}. Usa --ayuda")),
         }
     }
 
-    if let Some(hash) = verificar {
-        if opciones_generacion {
-            return Err("--verificar no puede combinarse con opciones de generación".into());
-        }
-        Ok(Accion::Verificar(hash))
-    } else {
-        Ok(Accion::Generar {
-            longitud,
-            cantidad,
-            con_hash,
-        })
-    }
+    Ok(Accion::Generar {
+        longitud,
+        con_hash,
+    })
 }
 
 fn ayuda() {
     println!("Generador de contraseñas seguras (Rust / Argon2id)\n");
     println!("Uso:");
-    println!("  ./generar-contrasena [--longitud N] [--cantidad N] [--sin-hash]");
-    println!("  ./generar-contrasena --verificar 'HASH_ARGON2ID'");
+    println!("  ./generar-contrasena [--longitud N] [--sin-hash]");
     println!("  ./generar-contrasena --ayuda\n");
-    println!("Por defecto: 32 caracteres y hash Argon2id por contraseña.");
-    println!("Longitud: {MIN_LENGTH}-{MAX_LENGTH}. Cantidad: 1-{MAX_COUNT}.");
-    println!("Al verificar, la contraseña se solicita sin mostrarla en pantalla.");
+    println!("Por defecto genera 1 contraseña de 32 caracteres y su hash Argon2id.");
+    println!("Longitud permitida: {MIN_LENGTH}-{MAX_LENGTH}.");
 }
 
-// Devuelve false cuando la contraseña no coincide para indicar fallo al shell.
-fn ejecutar() -> Result<bool, String> {
+fn ejecutar() -> Result<(), String> {
     match argumentos()? {
         Accion::Ayuda => ayuda(),
         Accion::Generar {
             longitud,
-            cantidad,
             con_hash,
         } => {
-            for i in 1..=cantidad {
-                let contrasena = generar(longitud);
-                println!("Contraseña {i}: {contrasena}");
-                if con_hash {
-                    println!("Hash Argon2id {i}: {}", hash_contrasena(&contrasena)?);
-                }
-                if i < cantidad {
-                    println!();
-                }
-            }
-        }
-        Accion::Verificar(hash) => {
-            let hash = PasswordHash::new(&hash).map_err(|e| format!("hash no válido: {e}"))?;
-            if hash.algorithm.as_str() != "argon2id" {
-                return Err("el hash debe ser Argon2id".into());
-            }
-            let contrasena = rpassword::prompt_password("Contraseña a verificar: ")
-                .map_err(|e| format!("no se pudo leer la contraseña: {e}"))?;
-            if argon2id()
-                .verify_password(contrasena.as_bytes(), &hash)
-                .is_ok()
-            {
-                println!("La contraseña coincide.");
-            } else {
-                println!("La contraseña no coincide.");
-                return Ok(false);
+            let contrasena = generar(longitud);
+            println!("Contraseña: {contrasena}");
+            if con_hash {
+                println!("Hash Argon2id: {}", hash_contrasena(&contrasena)?);
             }
         }
     }
-    Ok(true)
+    Ok(())
 }
 
 fn main() {
-    match ejecutar() {
-        Ok(true) => {}
-        Ok(false) => std::process::exit(1),
-        Err(e) => {
-            eprintln!("Error: {e}");
-            std::process::exit(2);
-        }
+    if let Err(e) = ejecutar() {
+        eprintln!("Error: {e}");
+        std::process::exit(1);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use argon2::password_hash::{PasswordHash, PasswordVerifier};
 
     #[test]
     fn cumple_longitud_y_categorias() {

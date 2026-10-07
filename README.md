@@ -1,32 +1,39 @@
 # Generador de contraseñas (Rust)
 
-Genera contraseñas con aleatoriedad criptográfica del sistema operativo (`OsRng`), de 32 caracteres por defecto, mezclando minúsculas, mayúsculas, números y símbolos. Para guardar y verificar contraseñas, produce hashes **Argon2id** con sal aleatoria independiente por contraseña (64 MiB, 3 pasadas, 1 hilo). El hash no es la contraseña ni permite recuperarla.
+Genera de forma automatizada contraseñas con aleatoriedad criptográfica del sistema operativo (`OsRng`), de 32 caracteres por defecto, mezclando minúsculas, mayúsculas, números y símbolos. Genera simultáneamente el hash **Argon2id** con sal aleatoria independiente (64 MiB, 3 pasadas, 1 hilo).
 
-## Ejecutar en la terminal
+Optimizado para **ejecución única y automatizada**, sin interacción manual ni dependencias superfluas.
 
-Se necesita Rust y Cargo. Si no están instalados, obtén Rust en <https://rustup.rs/>. Desde esta carpeta:
+## Ejecución automatizada
+
+El script `./generar-contrasena` detecta si el binario de release ya está compilado y actualizado. Si no existe o se modificó el código, compila automáticamente en segundo plano y ejecuta de forma directa el binario nativo:
 
 ```sh
 ./generar-contrasena
+```
+
+Salida típica:
+```text
+Contraseña: {f(K9%mE4n_R?zT[Ip&d2e]3mZ2_q&I!
+Hash Argon2id: $argon2id$v=19$m=65536,t=3,p=1$u3...
+```
+
+### Opciones admitidas
+
+```sh
+# Personalizar la longitud (16 a 256 caracteres)
 ./generar-contrasena --longitud 40
-./generar-contrasena --cantidad 3
+
+# Generar solo la contraseña sin calcular el hash Argon2id
 ./generar-contrasena --sin-hash
+
+# Ver la ayuda
 ./generar-contrasena --ayuda
 ```
 
-La primera ejecución compila el programa; las siguientes reutilizan la compilación. También se puede usar `cargo run --release -- [opciones]`. Se admiten longitudes de 16 a 256 y cantidades de 1 a 20.
-
-Para comprobar una contraseña guardada frente a su hash (pega solo el hash como argumento):
-
-```sh
-./generar-contrasena --verificar '$argon2id$v=19$m=65536,t=3,p=1$...'
-```
-
-Se solicita la contraseña sin mostrarla en pantalla ni pasarla como argumento del shell. Si no coincide, el programa devuelve código de salida 1.
-
-**Importante:** una contraseña no puede garantizarse «incrackeable». Su resistencia depende de su aleatoriedad, longitud y del cuidado al almacenarla. Guarda la contraseña en un gestor de contraseñas y el hash solo donde necesites verificarla; no almacenes ambos juntos. Mostrar contraseñas en la terminal puede dejarlas en el historial de desplazamiento de la terminal o en registros si rediriges la salida. No pases contraseñas como argumentos de comandos.
-
 ## Pruebas
+
+Para ejecutar la suite de pruebas unitarias:
 
 ```sh
 cargo test
