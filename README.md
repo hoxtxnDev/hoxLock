@@ -49,6 +49,20 @@ Solo ejecuta el script en la raíz del proyecto:
 ```text
 Contraseña: {f(K9%mE4n_R?zT[Ip&d2e]3mZ2_q&I!
 Hash Argon2id: $argon2id$v=19$m=65536,t=3,p=1$Qmu7Ue5I1ffA3uvhw4D7Ug$oT8VjCoa8tBKIpIL8Y64bJ39qrIRcr/IT50yWB9/tsw
+
+           /\
+          <  >
+           \/
+           ||
+      /\   ||   /\
+     <  >==++==<  >
+      \/   ||   \/
+           ||
+           ||
+           ||
+           ||
+          /||\
+         /____\
 ```
 
 ### Opciones de línea de comandos
@@ -105,3 +119,19 @@ cargo test
 ## 🇨🇱 Hecho en Chile
 
 Desarrollado con dedicación y enfoque en ingeniería de ciberseguridad desde **Chile 🇨🇱** por [**@hoxtxnDev**](https://github.com/hoxtxnDev).
+
+```text
+           /\
+          <  >
+           \/
+           ||
+      /\   ||   /\
+     <  >==++==<  >
+      \/   ||   \/
+           ||
+           ||
+           ||
+           ||
+          /||\
+         /____\
+```

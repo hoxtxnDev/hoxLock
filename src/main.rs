@@ -95,6 +95,22 @@ fn ayuda() {
     println!("Longitud permitida: {MIN_LENGTH}-{MAX_LENGTH}.");
 }
 
+const CRUZ_GOTICA: &str = r#"
+           /\
+          <  >
+           \/
+           ||
+      /\   ||   /\
+     <  >==++==<  >
+      \/   ||   \/
+           ||
+           ||
+           ||
+           ||
+          /||\
+         /____\
+"#;
+
 fn ejecutar() -> Result<(), String> {
     match argumentos()? {
         Accion::Ayuda => ayuda(),
@@ -107,6 +123,7 @@ fn ejecutar() -> Result<(), String> {
             if con_hash {
                 println!("Hash Argon2id: {}", hash_contrasena(&contrasena)?);
             }
+            println!("{CRUZ_GOTICA}");
         }
     }
     Ok(())
