@@ -1,0 +1,24 @@
+#!/bin/sh
+set -eu
+
+cd "$(dirname "$0")"
+
+# Localizar cargo si no está en PATH
+CARGO_BIN="${CARGO_HOME:-$HOME/.cargo}/bin"
+if [ -d "$CARGO_BIN" ]; then
+    PATH="$CARGO_BIN:$PATH"
+    export PATH
+fi
+
+BIN="target/release/hoxlock"
+
+# Compilar automáticamente si el binario no existe o si el código fuente ha cambiado
+if [ ! -f "$BIN" ] || [ "src/main.rs" -nt "$BIN" ] || [ "Cargo.toml" -nt "$BIN" ]; then
+    if ! command -v cargo >/dev/null 2>&1; then
+        echo "Error: falta Rust/Cargo para compilar. Instálalo desde https://rustup.rs/" >&2
+        exit 127
+    fi
+    cargo build --release --quiet
+fi
+
+exec "$BIN" "$@"

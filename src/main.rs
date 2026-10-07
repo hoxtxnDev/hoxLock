@@ -87,10 +87,10 @@ fn argumentos() -> Result<Accion, String> {
 }
 
 fn ayuda() {
-    println!("Generador de contraseñas seguras (Rust / Argon2id)\n");
+    println!("hoxLock - Generador de contraseñas seguras (Rust / Argon2id)\n");
     println!("Uso:");
-    println!("  ./generar-contrasena [--longitud N] [--sin-hash]");
-    println!("  ./generar-contrasena --ayuda\n");
+    println!("  ./hoxlock [--longitud N] [--sin-hash]");
+    println!("  ./hoxlock --ayuda\n");
     println!("Por defecto genera 1 contraseña de 32 caracteres y su hash Argon2id.");
     println!("Longitud permitida: {MIN_LENGTH}-{MAX_LENGTH}.");
 }

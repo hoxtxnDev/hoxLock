@@ -1,8 +1,15 @@
 [package]
-name = "generador-contrasenas"
+name = "hoxlock"
 version = "0.1.0"
 edition = "2021"
-description = "Generador de contraseñas aleatorias con hashes Argon2id"
+description = "hoxLock - Generador automatizado de contraseñas de alta entropía con hashes Argon2id"
+authors = ["hoxtxnDev"]
+license = "MIT"
+repository = "https://github.com/hoxtxnDev/hoxLock"
+
+[[bin]]
+name = "hoxlock"
+path = "src/main.rs"
 
 [dependencies]
 argon2 = "0.5.3"

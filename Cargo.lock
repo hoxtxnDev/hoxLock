@@ -75,14 +75,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "generador-contrasenas"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "rand",
-]
-
-[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -101,6 +93,14 @@ dependencies = [
  "cfg-if",
  "libc",
  "wasi",
+]
+
+[[package]]
+name = "hoxlock"
+version = "0.1.0"
+dependencies = [
+ "argon2",
+ "rand",
 ]
 
 [[package]]
